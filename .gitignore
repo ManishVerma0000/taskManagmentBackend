@@ -1,0 +1,59 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+
+# Environment and virtual environment files
+.env
+env/
+venv/
+
+# IDE specific files
+.idea/
+.vscode/
+
+# Web server files
+__init__.py
+*.pyc
+
+# Compiled files
+*.com
+*.class
+*.dll
+*.exe
+*.o
+*.so
+#enviorment variable file
+backend
+# Temporary files
+*.swp
+*~
+
+# Package directories
+*.egg-info/
+dist/
+build/
+
+# Database files
+*.sqlite
+
+# Logs and cache files
+*.log
+*.cache
+
+# Environment variables file
+.env
+
+# Configuration files
+instance/config.py
+
+# Compiled Python files
+*.pyc
+
+# Uncomment the following if you have a static folder with large files
+# static/
+
+# Uncomment the following if you have an uploads folder
+# uploads/
+
+# Uncomment the following if you have a node_modules folder (for frontend development)
+# node_modules/
