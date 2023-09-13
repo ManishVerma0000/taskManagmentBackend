@@ -1,60 +1,71 @@
 import win32com.client
 import os
 import openpyxl
-import pytz
-import schedule
-import time
+from openpyxl import Workbook
 
-def emailExtract():
-    current_directory = os.getcwd()
-folder_name = "outlook_attachments"
-outlook = win32com.client.Dispatch("Outlook.Application").GetNamespace("MAPI")
-inbox = outlook.GetDefaultFolder(6)
-messages = inbox.Items
-wb = openpyxl.Workbook()
-ws = wb.active
-header = ["index","Received Time", "Subject", "Sender", "Sender Email Address","Body"]
-ws.append(header)
+# Function to save email attachments to a folder and record file paths in an Excel sheet
+def save_attachments_and_record_paths():
+    folder_name = "outlook_attachments"
+    outlook = win32com.client.Dispatch("Outlook.Application").GetNamespace("MAPI")
+    inbox = outlook.GetDefaultFolder(6)
+    messages = inbox.Items
 
-try: 
-    i=0
-    for  index, message in enumerate(messages):
-        
-        
-        subject = message.Subject  
-        try:
-            received_time = message.ReceivedTime    
-            received_time = received_time.replace(tzinfo=None)
-        except Exception as e:
-            received_time = "N/A"  
-        try:
-            sender = message.SenderName
-        except Exception as e:
-            sender = "N/A"  
-        try:
-            sender_email_address = message.SenderEmailAddress 
-        except Exception as e:
-            sender = "N/A"  
+    if not os.path.exists(folder_name):
+        os.makedirs(folder_name)
 
-        try:
-            Body = message.Body 
-        except Exception as e:
-            sender = "N/A"  
-        
-        data = [index,received_time, subject, sender, sender_email_address,Body]
-        print("api is hit")
-        ws.append(data)
+    
+    wb = Workbook()
+    ws = wb.active
+    header = ["Subject", "Attachment Path"]
+    ws.append(header)
+
+    try:
+        for message in messages:
+            subject = message.Subject
+            # Check for attachments
+            if message.Attachments.Count > 0:
+                for attachment in message.Attachments:
+                    filename =os.path.join(os.getcwd(),folder_name,attachment.FileName)
+                    file_name = attachment.FileName
+                    # file_extension = file_name.split('.')[-1]
+                    # print(file_extension)
+                    
+                    if file_name.endswith(".png") or file_name.endswith(".jpg"):
+                        print(file_name)
+
+                    else:
+                        print(file_name)
+                        if(file_name):
+                            try:
+                                attachment.SaveAsFile(filename)
+                                ws.append([subject, filename])
+                            except:
+                                ws.append([subject,'null'])
 
 
-except Exception as e:
-    print(e)
-excel_file_path = "output.xlsx"
-wb.save(excel_file_path)
-wb.close()
+                        
+                    # Add the file extension to the set
+                    # attachment_types.add(file_extension.lower())
+                    # if(filename.find('.png')):
+                    #     print(filename)
+                  
+                    # file_extension = filename.split('.')[-1]
+                    # print(file_extension,'this is the value of the extension')
+                    
+                    # if(filename):
+                    #     try:
+                    #         attachment.SaveAsFile(filename)
+                    #         ws.append([subject, filename])
+                    #     except :
+                    #         ws.append([subject,'null'])
+                    # else:
+                    #     print("errr")
 
+                excel_file_path = "attachment_paths.xlsx"
+                wb.save(excel_file_path)
+                  
+    except Exception as e:
+        print(f"Error: {str(e)}")
 
-       
-schedule.every(1).minutes.do(emailExtract)  # Set the time to 2:30 PM
-while True:
-    schedule.run_pending()
-    time.sleep(1)
+if __name__ == "__main__":
+    save_attachments_and_record_paths()
