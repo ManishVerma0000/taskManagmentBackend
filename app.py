@@ -10,6 +10,8 @@ from flask_cors import CORS
 app = Flask(__name__)
 CORS(app)
 
+# admin routes =>>>>>>>>
+
 
 @app.route("/result")
 def readExcelFile():
@@ -83,7 +85,6 @@ def UserLogin():
             else:
                 correct_password = df.loc[df['email']
                                           == email, 'password'].values[0]
-                print(correct_password)
                 if (correct_password == password):
                     response = jsonify({"data": request.get_json()})
                     response.status_code = 200
@@ -245,6 +246,105 @@ def totalAssign():
         response.status_code = 200
         return response
     except:
+        response = jsonify({"message": "error occurs"})
+        response.status_code = 400
+        return response
+
+
+# user routes
+
+@app.route("/userAssignedTask")
+def useAssingedTask():
+    try:
+        response = jsonify({"message": "success"})
+        response.status_code(200)
+        return response
+    except Exception as e:
+        response = jsonify({"message": "error occurs"})
+        response.status_code = 400
+        return response
+
+
+@app.route("/userList")
+def addtheuser():
+    try:
+        data1 = pd.read_excel("userdata.xlsx")
+        result = (data1.to_json(orient='records'))
+        print(result, 'this is the result')
+        response = jsonify(
+            {"message": "the list of the user is", "data": result})
+        return response
+    except Exception as e:
+        response = jsonify({"message": "error occurs"})
+        response.status_code(400)
+        return response
+
+
+@app.route("/TaskAddByUser")
+def taskAddbyUser():
+    try:
+        TaskTitle = request.get_json()['TaskTitle']
+        AssignedTo = request.get_json()['AssignedTo']
+        Status = request.get_json()['Status']
+        completion = request.get_json()['completion']
+        Priority = request.get_json()['Priority']
+        StartDate = request.get_json()['StartDate']
+        DueDate = request.get_json()['DueDate']
+        CompletedDate = request.get_json()['CompletedDate']
+        Remarks = request.get_json()['Remarks']
+        Description = request.get_json()['Description']
+        if not TaskTitle or not AssignedTo or not Status or not completion or not Priority or not StartDate or not DueDate or not CompletedDate or not Remarks or not Description:
+            response = jsonify({"message": "please enter all the details"})
+            response.status_code = 400
+            return response
+        else:
+            data_to_insert = [{
+                "TaskTitle":  TaskTitle,
+                "AssignedTo": AssignedTo,
+                "Status": Status,
+                "completion": completion,
+                "Priority": Priority,
+                "StartDate": StartDate,
+                "DueDate": DueDate,
+                "CompletedDate": CompletedDate,
+                "Remarks": Remarks,
+                "Description": Description
+            }]
+            new_data = pd.DataFrame(data_to_insert)
+            df = pd.concat([df, new_data], ignore_index=True)
+            df.to_excel('AssignedTaskDetails.xlsx',  index=False)
+            response = jsonify({"message": "Task is completed"})
+            response.status_code = 200
+            return response
+    except Exception as e:
+        TaskTitle = request.get_json()['TaskTitle']
+        AssignedTo = request.get_json()['AssignedTo']
+        Status = request.get_json()['Status']
+        completion = request.get_json()['completion']
+        Priority = request.get_json()['Priority']
+        StartDate = request.get_json()['StartDate']
+        DueDate = request.get_json()['DueDate']
+        CompletedDate = request.get_json()['CompletedDate']
+        Remarks = request.get_json()['Remarks']
+        Description = request.get_json()['Description']
+        columns = ['TaskTitle', 'AssignedTo', 'Status', 'completion', 'Priority',
+                   'StartDate', 'DueDate', 'CompletedDate', 'Remarks', 'Description']
+        df = pd.DataFrame(columns=columns)
+        data_to_insert = [{
+            "TaskTitle":  TaskTitle,
+            "AssignedTo": AssignedTo,
+            "Status": Status,
+            "completion": completion,
+            "Priority": Priority,
+            "StartDate": StartDate,
+            "DueDate": DueDate,
+            "CompletedDate": CompletedDate,
+            "Remarks": Remarks,
+            "Description": Description
+        }]
+        new_data = pd.DataFrame(data_to_insert)
+        df = pd.concat([df, new_data], ignore_index=True)
+        df.to_excel('AssignedTaskDetails.xlsx',  index=False)
         response = jsonify({"message": "error occurs"})
         response.status_code = 400
         return response

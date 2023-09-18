@@ -22,13 +22,12 @@ def save_attachments_and_record_paths():
     try:
         for message in messages:
             subject = message.Subject
-            # Check for attachments
+        
             if message.Attachments.Count > 0:
                 for attachment in message.Attachments:
                     filename =os.path.join(os.getcwd(),folder_name,attachment.FileName)
                     file_name = attachment.FileName
-                    # file_extension = file_name.split('.')[-1]
-                    # print(file_extension)
+                  
                     
                     if file_name.endswith(".png") or file_name.endswith(".jpg"):
                         print(file_name)
@@ -41,26 +40,6 @@ def save_attachments_and_record_paths():
                                 ws.append([subject, filename])
                             except:
                                 ws.append([subject,'null'])
-
-
-                        
-                    # Add the file extension to the set
-                    # attachment_types.add(file_extension.lower())
-                    # if(filename.find('.png')):
-                    #     print(filename)
-                  
-                    # file_extension = filename.split('.')[-1]
-                    # print(file_extension,'this is the value of the extension')
-                    
-                    # if(filename):
-                    #     try:
-                    #         attachment.SaveAsFile(filename)
-                    #         ws.append([subject, filename])
-                    #     except :
-                    #         ws.append([subject,'null'])
-                    # else:
-                    #     print("errr")
-
                 excel_file_path = "attachment_paths.xlsx"
                 wb.save(excel_file_path)
                   
